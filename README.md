@@ -1,8 +1,5 @@
 # 🧬 EmojiLang: An Emoji-Only Programming Language Compiler & IDE
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Status: Academic](https://img.shields.io/badge/Status-Academic-orange.svg)](#)
-
 **EmojiLang** is a complete browser-based development environment and compiler for a programming language where every keyword, operator, and literal is an emoji. This project implements a full, modular compiler pipeline from lexical analysis to sandboxed execution, demonstrating deep compiler theory integrated into a modern web application.
 
 ## 🚀 Overview
