@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EmojiLang IDE — A complete compiler and development environment for an emoji-only programming language. Write, compile, and execute programs using only emojis.">
+  <title>EmojiLang IDE — Emoji Programming Language Compiler</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ═══ Header ═══ -->
+    <header class="header" id="header">
+      <div class="header__brand">
+        <span class="header__logo">🧬</span>
+        <div>
+          <div class="header__title">EmojiLang</div>
+          <div class="header__subtitle">Emoji Programming Language Compiler</div>
+        </div>
+      </div>
+
+      <div class="header__actions">
+        <select class="example-select" id="example-select" title="Load example program">
+          <option value="">📂 Load Example...</option>
+          <option value="hello">👋 Hello World</option>
+          <option value="arithmetic">🧮 Arithmetic</option>
+          <option value="conditional">🤔 Conditional</option>
+          <option value="loop">🔄 While Loop</option>
+          <option value="function">🎯 Function</option>
+          <option value="fibonacci">🌀 Fibonacci</option>
+          <option value="fizzbuzz">🎲 FizzBuzz</option>
+          <option value="array">📋 Arrays</option>
+        </select>
+
+        <button class="btn btn--secondary btn--icon" id="btn-clear-all" title="Clear all">
+          <span class="btn__emoji">🗑️</span>
+        </button>
+
+        <button class="btn btn--primary btn--run" id="btn-run" title="Compile & Run (Ctrl+Enter)">
+          <span class="btn__emoji">▶️</span>
+          <span>Run</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══ IDE Layout ═══ -->
+    <div class="ide-layout">
+
+      <!-- ── Left Top: Code Editor ── -->
+      <div class="panel panel--editor" id="panel-editor">
+        <div class="panel__header">
+          <div class="panel__title">
+            <span class="panel__title-emoji">📝</span>
+            Code Editor
+          </div>
+          <div class="panel__title" style="font-size: 0.7rem; color: var(--text-muted);" id="cursor-pos">Ln 1, Col 1</div>
+        </div>
+        <div class="panel__body">
+          <div class="editor-wrapper">
+            <div class="editor__lines" id="editor-lines">1</div>
+            <textarea
+              class="editor__textarea"
+              id="editor-textarea"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              placeholder="Write your emoji program here... &#10;&#10;Try loading an example from the dropdown above! ☝️"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Right Top: Visualization Panel ── -->
+      <div class="panel panel--viz" id="panel-viz">
+        <div class="panel__header">
+          <div class="panel__title">
+            <span class="panel__title-emoji">🔬</span>
+            Compiler Output
+          </div>
+          <div class="viz__tabs" id="viz-tabs">
+            <button class="viz__tab active" data-tab="tokens">Tokens</button>
+            <button class="viz__tab" data-tab="ast">AST</button>
+            <button class="viz__tab" data-tab="code">JS Code</button>
+            <button class="viz__tab" data-tab="errors">Errors</button>
+            <button class="viz__tab" data-tab="optimize">Optimize</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          <!-- Tokens Tab -->
+          <div class="viz__content viz__content--tokens active" id="tab-tokens">
+            <div class="token-empty" id="token-empty-state">
+              <span class="token-empty__emoji">🔍</span>
+              <span>Run your program to see the token stream</span>
+            </div>
+            <table class="token-table" id="token-table" style="display: none;">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Token</th>
+                  <th>Type</th>
+                  <th>Value</th>
+                  <th>Pos</th>
+                </tr>
+              </thead>
+              <tbody id="token-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- AST Tab -->
+          <div class="viz__content viz__content--ast" id="tab-ast">
+            <div class="ast-empty" id="ast-empty-state">
+              <span class="ast-empty__emoji">🌳</span>
+              <span>Run your program to see the Abstract Syntax Tree</span>
+            </div>
+            <div class="ast-canvas-container" id="ast-container" style="display: none;">
+              <canvas id="ast-canvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Code Tab -->
+          <div class="viz__content viz__content--code" id="tab-code">
+            <div class="code-empty" id="code-empty-state">
+              <span class="code-empty__emoji">💻</span>
+              <span>Run your program to see the generated JavaScript</span>
+            </div>
+            <pre class="code-viewer" id="code-viewer" style="display: none;"></pre>
+          </div>
+
+          <!-- Errors Tab -->
+          <div class="viz__content viz__content--errors" id="tab-errors">
+            <div class="code-empty" id="errors-empty-state">
+              <span class="code-empty__emoji">✅</span>
+              <span>No errors — your program looks great!</span>
+            </div>
+            <ul class="error-list" id="error-list" style="display: none;"></ul>
+          </div>
+
+          <!-- Optimize Tab -->
+          <div class="viz__content viz__content--optimize" id="tab-optimize">
+            <div class="code-empty" id="optimize-empty-state">
+              <span class="code-empty__emoji">⚡</span>
+              <span>Run your program to see optimization results</span>
+            </div>
+            <div class="opt-stats" id="opt-stats" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Left Bottom: Emoji Keyboard ── -->
+      <div class="panel panel--keyboard" id="panel-keyboard">
+        <div class="panel__header">
+          <div class="panel__title">
+            <span class="panel__title-emoji">⌨️</span>
+            Emoji Keyboard
+          </div>
+          <div class="keyboard__categories" id="keyboard-categories"></div>
+        </div>
+        <div class="panel__body">
+          <div class="keyboard__grid" id="keyboard-grid"></div>
+        </div>
+      </div>
+
+      <!-- ── Right Bottom: Output Console ── -->
+      <div class="panel panel--console" id="panel-console">
+        <div class="panel__header">
+          <div class="panel__title">
+            <span class="panel__title-emoji">🖥️</span>
+            Output Console
+          </div>
+          <button class="btn btn--secondary btn--clear" id="btn-clear-console">Clear</button>
+        </div>
+        <div class="panel__body">
+          <div class="console__output" id="console-output">
+            <span class="console__empty">Output will appear here after running your program...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ Stats Bar ═══ -->
+    <div class="stats-bar" id="stats-bar">
+      <div class="stats-bar__item">
+        <div class="stats-bar__dot" id="status-dot"></div>
+        <span id="status-text">Ready</span>
+      </div>
+      <div class="stats-bar__item" id="stat-tokens">
+        <span>Tokens: —</span>
+      </div>
+      <div class="stats-bar__item" id="stat-ast-nodes">
+        <span>AST Nodes: —</span>
+      </div>
+      <div class="stats-bar__item" id="stat-compile-time">
+        <span>Compile: —</span>
+      </div>
+      <div class="stats-bar__item" id="stat-optimizations">
+        <span>Optimizations: —</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Scripts (ES Modules) ═══ -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
